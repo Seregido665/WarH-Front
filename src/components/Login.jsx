@@ -4,12 +4,13 @@ import { useNavigate } from "react-router-dom";
 import AuthContext from "../contexts/authContext";
 
 const Login = () => {
-  const { handleSetUser } = useContext(AuthContext)
+  const { login } = useContext(AuthContext)
   const [userInfo, setUserInfo] = useState({
     email: '',
     password: ''
   });
   const [error, setError] = useState()
+  const [loading, setLoading] = useState(false)
   const navigate = useNavigate();
 
   const handleChange = (event) => {
@@ -22,6 +23,7 @@ const Login = () => {
 
   const handleLogin = (e) => {
     e.preventDefault();
+    setLoading(true)
 
     loginUser(userInfo)
       .then((response) => {
@@ -29,16 +31,18 @@ const Login = () => {
         console.log('response', response)
 
         // Asumir que la respuesta del backend incluye { token, user } o solo { token }
-        if (response.token) {
+        if (response?.token) {
           console.log('response tiene token', response)
-          handleSetUser(response) // response debería tener { token, user }
+          login(response) // handle storing token and fetching profile
         }
-        setError({})
+        setError(null)
         navigate("/profile")
       })
       .catch((err) => {
-        setError(err.response.data.message)
-      });
+        const msg = err?.response?.data?.message || err.message || 'Login failed';
+        setError(msg)
+      })
+      .finally(() => setLoading(false));
   }
 
   return (
@@ -68,13 +72,14 @@ const Login = () => {
           />
         </div>
 
-        {error && <p class="text-danger">{error}</p>}
+        {error && <p className="text-danger">{error}</p>}
 
         <button
           type="submit"
           className="submit-button"
+          disabled={loading}
         >
-          Login
+          {loading ? 'Logging in...' : 'Login'}
         </button>
 
         <p className="auth-link">

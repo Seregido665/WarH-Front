@@ -1,15 +1,14 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Home from './pages/Home'
-import BookDetail from './pages/BookDetail'
 import './App.css'
 import NavBar from './components/NavBar'
 import Register from './components/Register'
 import Login from './components/Login'
 import Profile from './pages/Profile'
-import BookForm from './pages/BookForm'
 import ProtectedRoute from './components/ProtectedRoute'
-import UserList from './pages/UserList'
-import ChatDetail from './pages/ChatDetail'
+import CreateArticle from './pages/CreateArticle'
+import Store from './pages/Store'
+import ProductDetail from './pages/ProductDetail'
 
 
 
@@ -20,16 +19,22 @@ function App() {
       <NavBar />
       <div>
         <Routes>
-          <Route path="/users" element={<ProtectedRoute><UserList /></ProtectedRoute>} />
           <Route path="/" element={<Home />} />
-          <Route path="/books/:id" element={<BookDetail />} />
-          <Route path="/books/create" element={<ProtectedRoute><BookForm /></ProtectedRoute>} />
-          <Route path="/chat/:id" element={<ProtectedRoute><ChatDetail></ChatDetail></ProtectedRoute>} />
           <Route path="/profile" element={
             <ProtectedRoute>
               <Profile />
             </ProtectedRoute>
           } />
+
+          <Route path="/products/create" element={
+            <ProtectedRoute>
+              <CreateArticle />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/store" element={<Store />} />
+
+          <Route path="/products/:id" element={<ProductDetail />} />
 
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />

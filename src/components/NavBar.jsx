@@ -1,14 +1,16 @@
 import React, { useContext } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import ThemeContext from '../contexts/themeContext';
 import AuthContext from '../contexts/authContext';
 
 const NavBar = () => {
   const { theme, handleChangeTheme } = useContext(ThemeContext)
-  const { user, handleLogout, isAuthenticated } = useContext(AuthContext);
+  const { user, logout, isAuthenticated } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   const handleLogoutClick = () => {
-    handleLogout();
+    logout();
+    navigate('/login');
   };
 
   return (
@@ -21,6 +23,9 @@ const NavBar = () => {
           </button>
           <div className="collapse navbar-collapse" id="navbarNav">
             <ul className="navbar-nav">
+              <li className="nav-item">
+                <Link to="/store" className={`text-${theme === 'light' ? 'dark' : 'light'} nav-link`}>Store</Link>
+              </li>
               {!isAuthenticated && (
                 <>
                   <li className="nav-item">
@@ -33,6 +38,9 @@ const NavBar = () => {
               )}
               {isAuthenticated && (
                 <>
+                  <li className="nav-item">
+                    <Link to="/products/create" className={`text-${theme === 'light' ? 'dark' : 'light'} nav-link`}>Create Article</Link>
+                  </li>
                   <li className="nav-item">
                     <Link to="/books" className={`text-${theme === 'light' ? 'dark' : 'light'} nav-link`}>Books</Link>
                   </li>

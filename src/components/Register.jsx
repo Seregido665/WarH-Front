@@ -1,4 +1,4 @@
-import { use, useState } from "react";
+import { useState } from "react";
 import { registerUser } from "../services/userService";
 import { useNavigate } from "react-router-dom";
 
@@ -20,17 +20,19 @@ const Register = () => {
 
   const processRegistration = (event) => {
     event.preventDefault();
-
     registerUser(userInfo)
       .then(() => {
         setErrors({});
         navigate('/login')
       })
       .catch(errorResponse => {
-        if (errorResponse.status == 422) {
+        const status = errorResponse?.response?.status;
+        if (status === 422) {
           setErrors({ email: { message: 'Email already in use' } });
-        } else {
+        } else if (errorResponse?.response?.data?.errors) {
           setErrors(errorResponse.response.data.errors);
+        } else {
+          setErrors({ general: { message: errorResponse?.message || 'Registration failed' } });
         }
       });
   };
@@ -66,6 +68,7 @@ const Register = () => {
                   />
                   {errors.password && (<div className="text-danger mt-2">{errors.password.message}</div>)}
                 </div>
+                {errors.general && (<div className="text-danger mb-2">{errors.general.message}</div>)}
                 <button
                   type="submit"
                   className="btn btn-primary btn-lg w-100 mt-3"
