@@ -1,8 +1,27 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { deleteProduct } from '../services/productService';
 
-const Product = ({ item }) => {
+const Product = ({ item, isOwner = false, onDelete }) => {
   const { title, description, price, images = [], category } = item;
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    if (window.confirm('¿Estás seguro de que deseas eliminar este producto?')) {
+      try {
+        setIsDeleting(true);
+        await deleteProduct(item.id || item._id);
+        if (onDelete) {
+          onDelete(item.id || item._id);
+        }
+      } catch (error) {
+        console.error('Error deleting product:', error);
+        alert('Error al eliminar el producto');
+      } finally {
+        setIsDeleting(false);
+      }
+    }
+  };
 
   return (
     <div className="card mb-3">
@@ -23,6 +42,15 @@ const Product = ({ item }) => {
               >
                 Detalles
               </Link>
+              {isOwner && (
+                <button
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                  className="btn btn-danger btn-sm"
+                >
+                  {isDeleting ? 'Eliminando...' : 'Eliminar'}
+                </button>
+              )}
             </div>
           </div>
         </div>

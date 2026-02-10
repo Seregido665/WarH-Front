@@ -21,3 +21,7 @@ export const getUserById = (userId) => {
 export const getAllUsers = () => {
   return apiClient.get("/users");
 };
+
+export const updateProfile = (formData) => {
+  return apiClient.patch("/profile", formData);
+};

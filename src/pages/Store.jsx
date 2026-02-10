@@ -1,9 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { getProducts } from '../services/productService';
 import { getCategories } from '../services/categoryService';
 import Product from '../components/Product';
+import AuthContext from '../contexts/authContext';
 
 const Store = () => {
+  const { user } = useContext(AuthContext);
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -52,13 +54,28 @@ const Store = () => {
         const res = await getProducts(params);
         const data = res?.data || res;
         
+        // Get current user ID for filtering
+        const userId = user?.id || user?._id;
+        
         // Handle paginated response
         if (data?.data && data?.pagination) {
-          setProducts(data.data);
-          setTotal(data.pagination.total);
+          // Filter out products created by the current user
+          const filteredProducts = data.data.filter(p => {
+            const sellerId = p.seller?.id || p.seller?._id || p.seller;
+            // Ensure proper comparison of IDs (convert to string)
+            return String(sellerId) !== String(userId);
+          });
+          setProducts(filteredProducts);
+          setTotal(filteredProducts.length);
         } else if (Array.isArray(data)) {
-          setProducts(data);
-          setTotal(data.length);
+          // Filter out products created by the current user
+          const filteredProducts = data.filter(p => {
+            const sellerId = p.seller?.id || p.seller?._id || p.seller;
+            // Ensure proper comparison of IDs (convert to string)
+            return String(sellerId) !== String(userId);
+          });
+          setProducts(filteredProducts);
+          setTotal(filteredProducts.length);
         } else {
           setProducts([]);
           setTotal(0);
@@ -70,7 +87,7 @@ const Store = () => {
       }
     };
     loadProducts();
-  }, [selectedCategory, selectedSort, selectedStatus, currentPage]);
+  }, [selectedCategory, selectedSort, selectedStatus, currentPage, user?.id || user?._id]);
 
   const totalPages = Math.ceil(total / limit);
 

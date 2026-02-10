@@ -12,6 +12,7 @@ const ProductDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [buyingLoading, setBuyingLoading] = useState(false);
+  const [reservingLoading, setReservingLoading] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -46,8 +47,8 @@ const ProductDetail = () => {
     try {
       // Create order
       const orderData = {
-        product: product.id || product._id,
-        seller: product.seller?._id || product.seller,
+        product: product._id || product.id,
+        seller: product.seller?._id || product.seller?.id,
         type: 'purchase',
         quantity: 1,
       };
@@ -63,12 +64,57 @@ const ProductDetail = () => {
       setProduct(updatedData);
       
       alert('Product purchased successfully!');
+      // Redirect to profile to see the purchase
+      navigate('/profile');
     } catch (err) {
       const errorMsg = err?.response?.data?.message || err.message || 'Purchase failed';
       setError(errorMsg);
       alert(errorMsg);
     } finally {
       setBuyingLoading(false);
+    }
+  };
+
+  const handleReserve = async () => {
+    if (!user) {
+      alert('Please log in to reserve items');
+      return;
+    }
+
+    if (!product) {
+      alert('Product not found');
+      return;
+    }
+
+    setReservingLoading(true);
+    try {
+      // Create order with type 'reservation'
+      const orderData = {
+        product: product._id || product.id,
+        seller: product.seller?._id || product.seller?.id,
+        type: 'reservation',
+        quantity: 1,
+      };
+      
+      await createOrder(orderData);
+      
+      // Update product status to archived
+      await updateProductStatus(product.id || product._id, 'archived');
+      
+      // Refresh product data
+      const updatedRes = await getProductById(id);
+      const updatedData = updatedRes?.data || updatedRes;
+      setProduct(updatedData);
+      
+      alert('Product reserved successfully!');
+      // Redirect to profile to see the reservation
+      navigate('/profile');
+    } catch (err) {
+      const errorMsg = err?.response?.data?.message || err.message || 'Reservation failed';
+      setError(errorMsg);
+      alert(errorMsg);
+    } finally {
+      setReservingLoading(false);
     }
   };
 
@@ -208,8 +254,12 @@ const ProductDetail = () => {
                 >
                   {buyingLoading ? 'Processing...' : 'Buy Now'}
                 </button>
-                <button className="btn btn-warning btn-lg" disabled={status !== 'published'}>
-                  Reserve
+                <button 
+                  className="btn btn-warning btn-lg" 
+                  disabled={status !== 'published' || reservingLoading}
+                  onClick={handleReserve}
+                >
+                  {reservingLoading ? 'Processing...' : 'Reserve'}
                 </button>
               </div>
 

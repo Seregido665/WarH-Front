@@ -1,5 +1,4 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import Home from './pages/Home'
 import './App.css'
 import NavBar from './components/NavBar'
 import Register from './components/Register'
@@ -19,7 +18,7 @@ function App() {
       <NavBar />
       <div>
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Store />} />
           <Route path="/profile" element={
             <ProtectedRoute>
               <Profile />

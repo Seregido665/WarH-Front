@@ -23,7 +23,7 @@ export const deleteProduct = (id) => {
 };
 
 export const updateProductStatus = (id, status) => {
-  return apiClient.patch(`/products/${id}`, { status });
+  return apiClient.patch(`/products/${id}/status`, { status });
 };
 
 export default {
