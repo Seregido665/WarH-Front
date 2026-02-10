@@ -1,0 +1,67 @@
+.home-container {
+  width: 100%;
+  margin: 0 auto;
+  padding: 40px 20px;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.home-header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.home-header h1 {
+  font-size: 3rem;
+  font-weight: 800;
+  color: #1f2937;
+  margin: 0 0 16px 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.home-header p {
+  font-size: 1.25rem;
+  color: #6b7280;
+  margin: 0;
+  font-weight: 400;
+}
+
+.books-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+  padding: 0;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .home-container {
+    padding: 20px 16px;
+  }
+
+  .home-header h1 {
+    font-size: 2.25rem;
+  }
+
+  .home-header p {
+    font-size: 1.125rem;
+  }
+
+  .books-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .home-header h1 {
+    font-size: 1.875rem;
+  }
+
+  .books-grid {
+    grid-template-columns: 1fr;
+  }
+}
