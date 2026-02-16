@@ -5,6 +5,7 @@ import { getUserProducts } from "../services/productService";
 import { getMyOrders } from "../services/orderService";
 import { updateProfile } from "../services/userService";
 import Product from "../components/Product";
+import "../styles/profile.css";
 
 const Profile = () => {
   const { user } = useContext(AuthContext);
@@ -111,7 +112,7 @@ const Profile = () => {
   if (!user) return null;
 
   return (
-    <div className="container mt-5">
+    <div className="container">
       <div className="row justify-content-center">
         <div className="col-md-12">
           {/* User Info Section */}

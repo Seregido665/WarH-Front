@@ -1,7 +1,8 @@
 import { useContext, useState } from "react";
-import { loginUser } from "../services/userService";
+import { loginUser, forgotPassword } from "../services/userService";
 import { useNavigate } from "react-router-dom";
 import AuthContext from "../contexts/authContext";
+import "../styles/login.css";
 
 const Login = () => {
   const { login } = useContext(AuthContext)
@@ -45,30 +46,44 @@ const Login = () => {
       .finally(() => setLoading(false));
   }
 
+  const handleForgotPassword = async () => {
+    const email = window.prompt('Introduce tu email para recibir el enlace de recuperación:');
+    if (!email) return;
+    try {
+      const res = await forgotPassword(email);
+      const msg = res?.message || 'Si el email existe, se enviará un enlace de recuperación. Revisa tu bandeja.';
+      alert(msg);
+    } catch (err) {
+      console.error('Forgot password error', err);
+      const remoteMsg = err?.response?.data?.message || err?.message;
+      alert(remoteMsg || 'Error al solicitar recuperación de contraseña');
+    }
+  };
+
   return (
-    <div className="login-container">
+    <div className="login-container pt-5 pb-5">
       <form onSubmit={handleLogin} className="login-form">
-        <h2>Login</h2>
+        <h2>LOGIN</h2>
 
         <div className="form-group">
-          <label htmlFor="email">Email</label>
+          <label htmlFor="email">Correo</label>
           <input
             onChange={handleChange}
             type="email"
             id="email"
             name="email"
-            placeholder="Enter your email"
+            placeholder="Introduce tu correo"
           />
         </div>
 
         <div className="form-group">
-          <label htmlFor="password">Password</label>
+          <label htmlFor="password">Cotraseña</label>
           <input
             onChange={handleChange}
             type="password"
             id="password"
             name="password"
-            placeholder="Enter your password"
+            placeholder="Introduce tu contraseña"
           />
         </div>
 
@@ -79,12 +94,13 @@ const Login = () => {
           className="submit-button"
           disabled={loading}
         >
-          {loading ? 'Logging in...' : 'Login'}
+          {loading ? 'Iniciando...' : 'Iniciar Sesión'}
         </button>
-
-        <p className="auth-link">
-          Don't have an account? <a href="/register">Sign up</a>
-        </p>
+        <button type="button" className="btn btn-link pt-4" onClick={handleForgotPassword}>Olvido su contraseña?</button>
+        
+          <p className="auth-link mb-0 pt-4">Don't have an account?</p>
+          <a href="/register">REGISTRARSE</a>
+          
       </form>
     </div>
   );

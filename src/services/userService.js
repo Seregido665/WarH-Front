@@ -25,3 +25,7 @@ export const getAllUsers = () => {
 export const updateProfile = (formData) => {
   return apiClient.patch("/profile", formData);
 };
+
+export const forgotPassword = (email) => {
+  return apiClient.post('/forgot-password', { email });
+};

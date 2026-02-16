@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { deleteProduct } from '../services/productService';
+import "../styles/product.css";
 
 const Product = ({ item, isOwner = false, onDelete }) => {
   const { title, description, price, images = [], category } = item;
@@ -35,23 +36,32 @@ const Product = ({ item, isOwner = false, onDelete }) => {
             <p className="card-text text-muted">{category?.name || ''}</p>
             <p className="card-text">{description}</p>
             <p className="card-text"><strong>€{price}</strong></p>
-            <div style={{ display: 'flex', gap: '8px' }}>
+            <div>
               <Link 
                 to={`/products/${item.id || item._id}`} 
                 className="btn btn-primary btn-sm"
               >
-                Detalles
+                Comprar / Reservar
               </Link>
+              
+            </div>
+            {isOwner && (
+                <Link
+                  to={`/products/${item.id || item._id}/edit`}
+                  className="btn btn-secondary btn-sm mt-2 me-5"
+                >
+                  Editar
+                </Link>
+              )}
               {isOwner && (
                 <button
                   onClick={handleDelete}
                   disabled={isDeleting}
-                  className="btn btn-danger btn-sm"
+                  className="btn btn-danger btn-sm mt-2"
                 >
                   {isDeleting ? 'Eliminando...' : 'Eliminar'}
                 </button>
               )}
-            </div>
           </div>
         </div>
       </div>

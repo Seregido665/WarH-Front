@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { createProduct } from '../services/productService';
 import { createCategory } from '../services/categoryService';
 import { useNavigate } from 'react-router-dom';
+import "../styles/createForm.css";
 
 const CreateArticle = () => {
   const [form, setForm] = useState({ title: '', description: '', price: '' , category: ''});
@@ -67,9 +68,9 @@ const CreateArticle = () => {
   };
 
   return (
-    <div className="container mt-5">
+    <div className="container">
       <h3>Create New Article</h3>
-      <form onSubmit={handleSubmit} encType="multipart/form-data">
+      <form onSubmit={handleSubmit}>
         <div className="mb-3">
           <label className="form-label">Title</label>
           <input name="title" className="form-control" value={form.title} onChange={handleChange} required />

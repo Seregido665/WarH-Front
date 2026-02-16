@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AuthContext from '../contexts/authContext';
+import "../styles/nabvar.css";
 
 const NavBar = () => {
   const { user, logout, isAuthenticated } = useContext(AuthContext);
@@ -15,7 +16,6 @@ const NavBar = () => {
     <div>
       <nav className="navbar navbar-expand-lg bg-light">
         <div className="container-fluid">
-          <a className="navbar-brand text-dark" href="#">Navbar</a>
           <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span className="navbar-toggler-icon"></span>
           </button>
@@ -40,9 +40,6 @@ const NavBar = () => {
                     <Link to="/products/create" className="text-dark nav-link">Create Article</Link>
                   </li>
                   <li className="nav-item">
-                    <Link to="/books" className="text-dark nav-link">Books</Link>
-                  </li>
-                  <li className="nav-item">
                     <Link to="/profile" className="text-dark nav-link">Profile</Link>
                   </li>
                 </>
@@ -52,9 +49,6 @@ const NavBar = () => {
           <div>
             {isAuthenticated && user && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                <h6 className="text-dark mb-0">
-                  Hola: {user?.email}
-                </h6>
                 <button
                   className="btn btn-outline-danger btn-sm"
                   onClick={handleLogoutClick}

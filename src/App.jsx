@@ -8,6 +8,7 @@ import ProtectedRoute from './components/ProtectedRoute'
 import CreateArticle from './pages/CreateArticle'
 import Store from './pages/Store'
 import ProductDetail from './pages/ProductDetail'
+import EditProduct from './pages/EditProduct'
 
 
 
@@ -34,6 +35,11 @@ function App() {
           <Route path="/store" element={<Store />} />
 
           <Route path="/products/:id" element={<ProductDetail />} />
+          <Route path="/products/:id/edit" element={
+            <ProtectedRoute>
+              <EditProduct />
+            </ProtectedRoute>
+          } />
 
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />

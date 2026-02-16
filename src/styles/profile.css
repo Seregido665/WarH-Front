@@ -1,0 +1,86 @@
+/* profile.css - Página de perfil (coherente con auth y cards) */
+
+.container {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 3rem 1rem;
+  min-height: 100vh;
+}
+
+.card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+}
+
+.card-header {
+  background: #3182ce !important;
+  color: white;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+}
+
+.card-header.bg-secondary {
+  background: #4a5568 !important;
+}
+
+.card-body {
+  padding: 2rem;
+}
+
+.img-fluid.rounded-circle {
+  border: 4px solid white;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.img-fluid.rounded-circle:hover {
+  transform: scale(1.05);
+}
+
+.form-label {
+  color: #4a5568;
+  font-weight: 500;
+}
+
+.form-control-plaintext {
+  background: #f8fafc;
+  padding: 1.75rem 1rem;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+.nav-tabs {
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.nav-link {
+  color: #4a5568;
+  font-weight: 500;
+  padding: 1rem 1.5rem;
+  border-radius: 8px 8px 0 0;
+  transition: all 0.2s;
+}
+
+.nav-link.active {
+  color: #3182ce;
+  border-bottom: 3px solid #3182ce;
+  background: white;
+}
+
+.nav-link:hover {
+  color: #3182ce;
+}
+
+.text-muted {
+  color: #718096;
+}
+
+.btn-primary {
+  background: #3182ce;
+  border: none;
+}
+
+.btn-primary:hover {
+  background: #2b6cb0;
+}

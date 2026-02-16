@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { getProductById, updateProductStatus } from '../services/productService';
 import { createOrder } from '../services/orderService';
 import AuthContext from '../contexts/authContext';
+import "../styles/productDetail.css";
+import { getReviewsByProduct, createReview } from '../services/reviewService';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -13,6 +15,10 @@ const ProductDetail = () => {
   const [error, setError] = useState(null);
   const [buyingLoading, setBuyingLoading] = useState(false);
   const [reservingLoading, setReservingLoading] = useState(false);
+  const [reviews, setReviews] = useState([]);
+  const [newComment, setNewComment] = useState('');
+  const [postingReview, setPostingReview] = useState(false);
+  const [reviewsLoading, setReviewsLoading] = useState(true);
 
   useEffect(() => {
     const load = async () => {
@@ -30,6 +36,24 @@ const ProductDetail = () => {
       }
     };
     load();
+  }, [id]);
+
+  // Load reviews for the product
+  useEffect(() => {
+    const loadReviews = async () => {
+      try {
+        setReviewsLoading(true);
+        const res = await getReviewsByProduct(id);
+        const data = res?.data || res;
+        setReviews(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error('Failed to load reviews', err);
+        setReviews([]);
+      } finally {
+        setReviewsLoading(false);
+      }
+    };
+    loadReviews();
   }, [id]);
 
   const handleBuy = async () => {
@@ -118,6 +142,33 @@ const ProductDetail = () => {
     }
   };
 
+  const handleSubmitReview = async (e) => {
+    e.preventDefault();
+    if (!user) {
+      alert('Debes iniciar sesión para escribir una reseña');
+      return;
+    }
+    if (!newComment.trim()) return;
+
+    try {
+      setPostingReview(true);
+      // Guardamos la reseña con el formato "NombreUsuario : Comentario"
+      const username = user.name || user.email || 'Usuario';
+      const commentPayload = `${username} : ${newComment.trim()}`;
+      await createReview({ productId: id, comment: commentPayload });
+      // Recargar reseñas
+      const res = await getReviewsByProduct(id);
+      const data = res?.data || res;
+      setReviews(Array.isArray(data) ? data : []);
+      setNewComment('');
+    } catch (err) {
+      console.error('Error posting review', err);
+      alert(err?.response?.data?.message || err.message || 'Error al enviar la reseña');
+    } finally {
+      setPostingReview(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="container mt-5">
@@ -175,6 +226,50 @@ const ProductDetail = () => {
                 <span className="text-muted">No image available</span>
               </div>
             )}
+          </div>
+          {/* Reviews Section */}
+          <div className="card mb-4">
+            <div className="card-body">
+              <h5 className="card-title">Reseñas</h5>
+
+              {reviewsLoading ? (
+                <p className="text-muted">Cargando reseñas...</p>
+              ) : (
+                <div>
+                  {reviews.length === 0 && <p className="text-muted">Sé el primero en comentar este producto.</p>}
+                  {reviews.map((r) => (
+                    <div key={r.id || r._id} className="mb-2">
+                      <div className="border rounded p-2">
+                        <small className="text-muted">{r.comment}</small>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Comment form for authenticated users */}
+              {user ? (
+                <form onSubmit={handleSubmitReview} className="mt-3">
+                  <div className="mb-2">
+                    <textarea
+                      className="form-control"
+                      rows={3}
+                      placeholder="Escribe tu reseña..."
+                      value={newComment}
+                      onChange={(e) => setNewComment(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <button className="btn btn-primary" type="submit" disabled={postingReview}>
+                      {postingReview ? 'Enviando...' : 'Enviar reseña'}
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <p className="text-muted mt-3">Inicia sesión para escribir una reseña.</p>
+              )}
+            </div>
           </div>
 
           {/* Product Info */}

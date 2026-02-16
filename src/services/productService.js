@@ -26,6 +26,10 @@ export const updateProductStatus = (id, status) => {
   return apiClient.patch(`/products/${id}/status`, { status });
 };
 
+export const updateProduct = (id, formData) => {
+  return apiClient.patch(`/products/${id}`, formData);
+};
+
 export default {
   getProducts,
   getUserProducts,
