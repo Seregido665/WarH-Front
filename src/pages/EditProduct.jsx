@@ -18,10 +18,10 @@ const EditProduct = () => {
           title: data.title || '',
           description: data.description || '',
           price: data.price || '',
-          category: data.category?._id || data.category || '',
+          category: data.category?.id || data.category?._id || data.category || '',
         });
       } catch (err) {
-        console.error(err);
+        console.error('Error al cargar producto:', err);
       }
     };
     load();
@@ -43,14 +43,14 @@ const EditProduct = () => {
       const fd = new FormData();
       fd.append('title', form.title);
       fd.append('description', form.description);
-      fd.append('price', Number(form.price));
+      fd.append('price', form.price);
       fd.append('category', form.category);
       images.forEach(file => fd.append('images', file));
 
       await updateProduct(id, fd);
       navigate(`/products/${id}`);
     } catch (err) {
-      console.error(err);
+      console.error('Error al actualizar:', err);
     } finally {
       setSaving(false);
     }

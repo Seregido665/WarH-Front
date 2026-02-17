@@ -55,18 +55,17 @@ const Store = () => {
         }
 
         const res = await getProducts(params);
-        const data = res?.data || res;
 
         let allProducts = [];
         let totalCount = 0;
 
         // - PAGINACIÓN -
-        if (data?.data && data?.pagination) {
-          allProducts = data.data || [];
-          totalCount = data.pagination.total || allProducts.length;
-        } else if (Array.isArray(data)) {
-          allProducts = data;
-          totalCount = data.length;
+        if (res?.data && res?.pagination) {
+          allProducts = res.data || [];
+          totalCount = res.pagination.total || allProducts.length;
+        } else if (Array.isArray(res)) {
+          allProducts = res;
+          totalCount = res.length;
         } else {
           allProducts = [];
           totalCount = 0;
@@ -74,31 +73,27 @@ const Store = () => {
 
         // - SOLO PUEDE APLICAR FILTROS UN USUARIO LOGUEADO -
         const userId = user?._id || user?.id;
-        const displayedProducts = userId
+        const displayedProducts = userId && allProducts.length > 0
           ? allProducts.filter((product) => {
               const sellerId = product.seller?._id || product.seller?.id || product.seller;
-              return sellerId && String(sellerId) !== String(userId);
+              return sellerId !== userId && String(sellerId) !== String(userId);
             })
           : allProducts;
 
         setProducts(displayedProducts);
         setTotal(totalCount);
+        setLoading(false);
 
       } catch (err) {
-        console.error('Error al cargar:', err);
+        console.error('Error al cargar productos:', err);
+        setProducts([]);
+        setTotal(0);
+        setLoading(false);
       }
     };
 
     loadProducts();
-  }, [
-    selectedCategory,
-    selectedSort,
-    selectedStatus,
-    currentPage,
-    authLoading,
-    user?._id,   // Dependencia explícita
-    user?.id
-  ]);
+  }, [selectedCategory, selectedSort, selectedStatus, currentPage, authLoading, user]);
 
   const totalPages = Math.ceil(total / limit);
 

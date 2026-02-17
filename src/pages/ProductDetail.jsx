@@ -11,20 +11,26 @@ const ProductDetail = () => {
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
   const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [newComment, setNewComment] = useState('');
+  const [actionLoading, setActionLoading] = useState(false);
 
   useEffect(() => {
     const load = async () => {
       try {
         setError(null);
+        setLoading(true);
         const res = await getProductById(id);
         const data = res?.data || res;
         setProduct(data);
       } catch (err) {
         console.error('Error al cargar el producto:', err);
-      } 
+        setError(err);
+      } finally {
+        setLoading(false);
+      }
     };
     load();
   }, [id]);
@@ -46,53 +52,99 @@ const ProductDetail = () => {
 
   // --- FUNCION DE COMPRAR PRODUCTO ---
   const handleBuy = async () => {
+    // Validar que usuario esté logueado
+    if (!user) {
+      alert('Debes iniciar sesión para comprar');
+      navigate('/login');
+      return;
+    }
+
+    // Validar que no sea creador
+    const sellerId = product.seller?.id || product.seller?._id || product.seller;
+    const userId = user.id || user._id;
+    if (String(sellerId) === String(userId)) {
+      alert('No puedes comprar tu propio producto');
+      return;
+    }
+
+    // Validar que no esté vendido o reservado
+    if (product.status === 'sold' || product.status === 'archived') {
+      alert('Este producto no está disponible');
+      return;
+    }
+
+    setActionLoading(true);
     try {
       const orderData = {
         product: product._id || product.id,
-        seller: product.seller?._id || product.seller?.id,
+        seller: sellerId,
         type: 'purchase',
         quantity: 1,
       };
       
       await createOrder(orderData);
-      
-      // -- CAMBIAR STATUS A SOLD --
       await updateProductStatus(product.id || product._id, 'sold');
       
       const updatedRes = await getProductById(id);
       const updatedData = updatedRes?.data || updatedRes;
       setProduct(updatedData);
       
-      alert('¡Venta realizada!');
+      alert('¡Compra realizada exitosamente!');
       navigate('/profile');
     } catch (err) {
-      setError(err);
+      console.error('Error al comprar:', err);
+      alert('Error al procesar la compra: ' + (err.response?.data?.message || err.message));
+    } finally {
+      setActionLoading(false);
     }
   };
 
-    // --- FUNCION DE RESERVAR PRODUCTO ---
+  // --- FUNCION DE RESERVAR PRODUCTO ---
   const handleReserve = async () => {
+    // Validar que usuario esté logueado
+    if (!user) {
+      alert('Debes iniciar sesión para reservar');
+      navigate('/login');
+      return;
+    }
+
+    // Validar que no sea el dueño
+    const sellerId = product.seller?.id || product.seller?._id || product.seller;
+    const userId = user.id || user._id;
+    if (String(sellerId) === String(userId)) {
+      alert('No puedes reservar tu propio producto');
+      return;
+    }
+
+    // Validar que no esté vendido o reservado
+    if (product.status === 'sold' || product.status === 'archived') {
+      alert('Este producto no está disponible');
+      return;
+    }
+
+    setActionLoading(true);
     try {
       const orderData = {
         product: product._id || product.id,
-        seller: product.seller?._id || product.seller?.id,
+        seller: sellerId,
         type: 'reservation',
         quantity: 1,
       };
       
       await createOrder(orderData);
-      
-      // -- CAMBIAR STATUS DE PRODUCTO A RESERVADO --
       await updateProductStatus(product.id || product._id, 'archived');
       
       const updatedRes = await getProductById(id);
       const updatedData = updatedRes?.data || updatedRes;
       setProduct(updatedData);
       
-      alert('¡Reserva realizada!');
+      alert('¡Reserva realizada exitosamente!');
       navigate('/profile');
     } catch (err) {
-      setError(err);
+      console.error('Error al reservar:', err);
+      alert('Error al procesar la reserva: ' + (err.response?.data?.message || err.message));
+    } finally {
+      setActionLoading(false);
     }
   };
 
@@ -115,7 +167,23 @@ const ProductDetail = () => {
     }
   };
 
-  const { title, description, price, images = [], category, seller, status } = product;
+  const { title, price, images = [], category, status } = product || {};
+
+  if (loading) {
+    return (
+      <div className="container mt-5">
+        <div className="alert alert-info">Cargando producto...</div>
+      </div>
+    );
+  }
+
+  if (!product || error) {
+    return (
+      <div className="container mt-5">
+        <div className="alert alert-danger">Error al cargar el producto</div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mt-5">
@@ -180,46 +248,9 @@ const ProductDetail = () => {
             </div>
           </div>
 
-          {/* - INFO DEL PRODUCTO - */}
-          <div className="card mb-4">
-            <div className="card-body">
-              <h1 className="card-title mb-3">{title}</h1>
-              
-              <div className="mb-3">
-                <span className="badge bg-info">{category?.name}</span>
-                <span className="badge bg-secondary ms-2">{status || 'published'}</span>
-              </div>
-              <p className="card-text">{description}</p>
-              <div className="mb-3">
-                <h3 className="text-success">€{price}</h3>
-              </div>
-
-              {seller && (
-                <div className="card bg-light mb-3">
-                  <div className="card-body">
-                    <h6 className="card-title">Seller</h6>
-                    <div className="d-flex align-items-center">
-                      {seller.avatar && (
-                        <img 
-                          src={seller.avatar} 
-                          alt={seller.name}
-                          className="rounded-circle me-3"
-                          style={{ width: '50px', height: '50px', objectFit: 'cover' }}
-                        />
-                      )}
-                      <div>
-                        <p className="mb-0"><strong>{seller.name || seller.email}</strong></p>
-                        <p className="mb-0 text-muted">{seller.email}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
         </div>
 
-        {/* Sidebar */}
+        {/* LATERAL */}
         <div className="col-lg-4">
           <div className="card sticky-top">
             <div className="card-body">
@@ -241,18 +272,26 @@ const ProductDetail = () => {
                 <p className="fw-bold">{status || 'published'}</p>
               </div>
 
+              {(status === 'sold' || status === 'archived') && (
+                <div className="alert alert-warning mb-3" role="alert">
+                  {status === 'sold' ? '❌ Este producto ya ha sido vendido' : '⚠️ Este producto se encuentra reservado'}
+                </div>
+              )}
+
               <div className="d-grid gap-2">
                 <button 
                   className="btn btn-success btn-lg"
                   onClick={handleBuy}
+                  disabled={actionLoading || product.status !== 'published'}
                 >
-                  COMPRAR
+                  {actionLoading ? 'Procesando...' : 'COMPRAR'}
                 </button>
                 <button 
                   className="btn btn-warning btn-lg" 
                   onClick={handleReserve}
+                  disabled={actionLoading || product.status !== 'published'}
                 >
-                  RESERVAR
+                  {actionLoading ? 'Procesando...' : 'RESERVAR'}
                 </button>
               </div>
             </div>

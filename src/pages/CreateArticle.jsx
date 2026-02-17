@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { createProduct } from '../services/productService';
-import { createCategory } from '../services/categoryService';
 import { useNavigate } from 'react-router-dom';
 import "../styles/createForm.css";
 
@@ -24,26 +23,18 @@ const CreateArticle = () => {
     setErrors(null);
 
     try {
-      let categoryId = form.category;
-      let catRes;
-      try {
-        catRes = await createCategory({ name: form.category });
-        categoryId = catRes?._id || catRes?.id || catRes;
-      } catch (catErr) {
-        console.log('Category might already exist:', catErr.message);
-      }
-
-      // 2. Create the product
+      // El backend se encarga de crear la categoría si no existe
       const fd = new FormData();
       fd.append('title', form.title);
       fd.append('description', form.description);
       fd.append('price', form.price);
-      fd.append('category', categoryId || form.category);
+      fd.append('category', form.category);
       images.forEach((file) => fd.append('images', file));
 
       await createProduct(fd);
       navigate('/store');
     } catch (err) {
+      setErrors({ general: err.message || 'Error al crear el producto' });
       console.log(err);
     }
   };
