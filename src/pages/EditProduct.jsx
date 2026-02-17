@@ -7,13 +7,11 @@ const EditProduct = () => {
   const navigate = useNavigate();
   const [form, setForm] = useState({ title: '', description: '', price: '', category: '' });
   const [images, setImages] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     const load = async () => {
       try {
-        setLoading(true);
         const res = await getProductById(id);
         const data = res?.data || res;
         setForm({
@@ -23,10 +21,7 @@ const EditProduct = () => {
           category: data.category?._id || data.category || '',
         });
       } catch (err) {
-        console.error('Failed to load product for edit', err);
-        alert('Error cargando el producto');
-      } finally {
-        setLoading(false);
+        console.error(err);
       }
     };
     load();
@@ -53,17 +48,13 @@ const EditProduct = () => {
       images.forEach(file => fd.append('images', file));
 
       await updateProduct(id, fd);
-      alert('Producto actualizado');
       navigate(`/products/${id}`);
     } catch (err) {
-      console.error('Error updating product', err);
-      alert(err?.response?.data?.message || 'Error al actualizar el producto');
+      console.error(err);
     } finally {
       setSaving(false);
     }
   };
-
-  if (loading) return <div className="container mt-5">Cargando...</div>;
 
   return (
     <div className="container mt-5">
@@ -89,7 +80,7 @@ const EditProduct = () => {
           <label className="form-label">Imagen</label>
           <input type="file" multiple accept="image/*" className="form-control" onChange={handleFiles} />
         </div>
-        <button className="btn btn-primary" type="submit" disabled={saving}>{saving ? 'Guardando...' : 'Guardar'}</button>
+        <button className="btn btn-primary" type="submit">Guardar</button>
       </form>
     </div>
   );

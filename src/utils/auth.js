@@ -1,4 +1,4 @@
-// Utilidades para manejar JWT
+// --- FUNCIONES DE AUTENTICACIÓN DE JWT---
 export const getToken = () => {
   return localStorage.getItem("jwt_token");
 };
@@ -19,7 +19,7 @@ export const isTokenExpired = (token) => {
     const currentTime = Date.now() / 1000;
     return payload.exp < currentTime;
   } catch (error) {
-    console.error("Error al decodificar el token:", error);
+    console.error(error);
     return true;
   }
 };
@@ -30,7 +30,7 @@ export const getTokenPayload = (token) => {
   try {
     return JSON.parse(atob(token.split(".")[1]));
   } catch (error) {
-    console.error("Error al decodificar el payload del token:", error);
+    console.error(error);
     return null;
   }
 };

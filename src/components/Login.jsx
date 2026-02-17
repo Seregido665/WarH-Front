@@ -29,25 +29,25 @@ const Login = () => {
     loginUser(userInfo)
       .then((response) => {
         console.log('Login exitoso')
-        console.log('response', response)
 
-        // Asumir que la respuesta del backend incluye { token, user } o solo { token }
         if (response?.token) {
-          console.log('response tiene token', response)
-          login(response) // handle storing token and fetching profile
+          login(response) 
         }
         setError(null)
+
         navigate("/profile")
       })
       .catch((err) => {
         const msg = err?.response?.data?.message || err.message || 'Login failed';
         setError(msg)
       })
-      .finally(() => setLoading(false));
+      .finally(() => 
+        setLoading(false)
+    );
   }
 
   const handleForgotPassword = async () => {
-    const email = window.prompt('Introduce tu email para recibir el enlace de recuperación:');
+    const email = window.prompt('Introduce tu email:');
     if (!email) return;
     try {
       const res = await forgotPassword(email);
@@ -98,7 +98,7 @@ const Login = () => {
         </button>
         <button type="button" className="btn btn-link pt-4" onClick={handleForgotPassword}>Olvido su contraseña?</button>
         
-          <p className="auth-link mb-0 pt-4">Don't have an account?</p>
+          <p className="auth-link mb-0 pt-4">No tienes cuenta?</p>
           <a href="/register">REGISTRARSE</a>
           
       </form>

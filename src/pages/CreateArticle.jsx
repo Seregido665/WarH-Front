@@ -8,7 +8,6 @@ const CreateArticle = () => {
   const [form, setForm] = useState({ title: '', description: '', price: '' , category: ''});
   const [images, setImages] = useState([]);
   const [errors, setErrors] = useState(null);
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -23,23 +22,14 @@ const CreateArticle = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrors(null);
-    setLoading(true);
 
     try {
-      // 1. Create or get category by name
       let categoryId = form.category;
-      if (!categoryId) {
-        throw new Error('Category is required');
-      }
-
-      // Try to create the category; if it fails because it already exists, that's ok
       let catRes;
       try {
         catRes = await createCategory({ name: form.category });
         categoryId = catRes?._id || catRes?.id || catRes;
       } catch (catErr) {
-        // If category creation fails (likely already exists), we'll try with the name
-        // The backend will validate and return a proper error if invalid
         console.log('Category might already exist:', catErr.message);
       }
 
@@ -47,23 +37,14 @@ const CreateArticle = () => {
       const fd = new FormData();
       fd.append('title', form.title);
       fd.append('description', form.description);
-      const priceValue = form.price === '' ? '' : Number(form.price);
-      fd.append('price', priceValue);
+      fd.append('price', form.price);
       fd.append('category', categoryId || form.category);
       images.forEach((file) => fd.append('images', file));
 
       await createProduct(fd);
       navigate('/store');
     } catch (err) {
-      const resp = err?.response?.data;
-      if (resp?.errors) {
-        setErrors(resp.errors);
-      } else {
-        const msg = resp?.message || err.message || 'Creation failed';
-        setErrors({ general: msg });
-      }
-    } finally {
-      setLoading(false);
+      console.log(err);
     }
   };
 
@@ -96,8 +77,8 @@ const CreateArticle = () => {
         {errors?.description && <div className="text-danger">Description: {errors.description}</div>}
         {errors?.price && <div className="text-danger">Price: {errors.price}</div>}
         {errors?.category && <div className="text-danger">Category: {errors.category}</div>}
-        <button className="btn btn-primary" type="submit" disabled={loading}>
-          {loading ? 'Creating...' : 'Create'}
+        <button className="btn btn-primary" type="submit">
+          CREAR
         </button>
       </form>
     </div>

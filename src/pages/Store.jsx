@@ -11,8 +11,6 @@ const Store = () => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
-  
-  // Filtros
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedSort, setSelectedSort] = useState('-createdAt');
   const [selectedStatus, setSelectedStatus] = useState('');
@@ -21,7 +19,7 @@ const Store = () => {
   const limit = 10;
   const [total, setTotal] = useState(0);
 
-  // Cargar categorías al montar el componente
+  // --- CARGAR CATEGORÍAS ---
   useEffect(() => {
     const loadCategories = async () => {
       try {
@@ -35,10 +33,8 @@ const Store = () => {
     loadCategories();
   }, []);
 
-  // Cargar productos cuando cambian filtros, orden o página
+  // --- APLICAR FILTROS Y CARGAR PRODUCTOS ---
   useEffect(() => {
-    // Esperar a que termine la restauración del usuario para evitar
-    // mostrar productos momentáneamente antes de aplicar el filtro
     if (authLoading) return;
 
     const loadProducts = async () => {
@@ -64,13 +60,11 @@ const Store = () => {
         let allProducts = [];
         let totalCount = 0;
 
-        // Normalizamos la respuesta según el formato que devuelva el backend
+        // - PAGINACIÓN -
         if (data?.data && data?.pagination) {
-          // Formato paginado típico (ej: { data: [...], pagination: { total, page, limit } })
           allProducts = data.data || [];
           totalCount = data.pagination.total || allProducts.length;
         } else if (Array.isArray(data)) {
-          // Respuesta plana (array de productos)
           allProducts = data;
           totalCount = data.length;
         } else {
@@ -78,10 +72,8 @@ const Store = () => {
           totalCount = 0;
         }
 
-        // Obtenemos el ID del usuario autenticado (si existe)
+        // - SOLO PUEDE APLICAR FILTROS UN USUARIO LOGUEADO -
         const userId = user?._id || user?.id;
-
-        // Filtramos solo si hay usuario logueado
         const displayedProducts = userId
           ? allProducts.filter((product) => {
               const sellerId = product.seller?._id || product.seller?.id || product.seller;
@@ -90,14 +82,10 @@ const Store = () => {
           : allProducts;
 
         setProducts(displayedProducts);
-        setTotal(totalCount); // ← Total real del backend (lo más común en tiendas)
+        setTotal(totalCount);
 
       } catch (err) {
-        console.error('Error al cargar productos:', err);
-        setProducts([]);
-        setTotal(0);
-      } finally {
-        setLoading(false);
+        console.error('Error al cargar:', err);
       }
     };
 
@@ -140,7 +128,7 @@ const Store = () => {
     <div className="container">
       <h2>Tienda</h2>
 
-      {/* Sección de filtros */}
+      {/* -- FILTROS -- */}
       <div className="card mb-4 p-4">
         <div className="row g-3">
           <div className="col-md-3">
@@ -166,7 +154,7 @@ const Store = () => {
               value={selectedSort}
               onChange={handleSortChange}
             >
-              <option value="-createdAt">Más recientes primero</option>
+              <option value="-createdAt">Más recientes</option>
               <option value="price">Precio: menor a mayor</option>
               <option value="-price">Precio: mayor a menor</option>
             </select>
@@ -187,7 +175,6 @@ const Store = () => {
           </div>
 
           <div className="col-md-3">
-            <label className="form-label fw-bold d-block">Limpiar</label>
             <button
               className="btn btn-secondary w-100"
               onClick={handleResetFilters}
@@ -205,7 +192,7 @@ const Store = () => {
         </div>
       )}
 
-      {/* Lista de productos */}
+      {/* - TOTAL DE PRODUCTOS */}
       {!loading && products.length > 0 && (
         <>
           <div className="mb-4">
@@ -215,7 +202,7 @@ const Store = () => {
             ))}
           </div>
 
-          {/* Paginación */}
+          {/* - PAGINACION - */}
           {totalPages > 1 && (
             <nav aria-label="Paginación de productos">
               <ul className="pagination justify-content-center">
@@ -246,14 +233,6 @@ const Store = () => {
             </nav>
           )}
         </>
-      )}
-
-      {loading && (
-        <div className="text-center my-5">
-          <div className="spinner-border text-primary" role="status">
-            <span className="visually-hidden">Cargando...</span>
-          </div>
-        </div>
       )}
     </div>
   );

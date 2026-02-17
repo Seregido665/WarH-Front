@@ -1,12 +1,9 @@
-// ProtectedRoute.jsx
 import { useContext } from 'react';
 import { Navigate } from 'react-router-dom';
 import AuthContext from '../contexts/authContext';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading, isAuthenticated } = useContext(AuthContext);
-  console.log('entro')
-  console.log('isAuthenticated', isAuthenticated, 'user', user, 'loading', loading)
 
   if (loading) {
     return (
@@ -21,7 +18,8 @@ const ProtectedRoute = ({ children }) => {
     );
   }
 
-  return isAuthenticated && user ? children : <Navigate to="/login" replace />;
+  return isAuthenticated && user ? children : <Navigate to="/login" replace />;   
+      // MANDA AL LOGIN SI NO ESTA LOGUEADO
 };
 
 export default ProtectedRoute;

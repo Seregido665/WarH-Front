@@ -11,7 +11,7 @@ const Register = () => {
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
-  const updateField = (event) => {
+  const handleChange = (event) => {
     const { name, value } = event.target;
     setUserInfo(prev => ({
       ...prev,
@@ -26,15 +26,9 @@ const Register = () => {
         setErrors({});
         navigate('/login')
       })
-      .catch(errorResponse => {
-        const status = errorResponse?.response?.status;
-        if (status === 422) {
-          setErrors({ email: { message: 'Email already in use' } });
-        } else if (errorResponse?.response?.data?.errors) {
-          setErrors(errorResponse.response.data.errors);
-        } else {
-          setErrors({ general: { message: errorResponse?.message || 'Registration failed' } });
-        }
+      .catch((err) => {
+        const msg = err?.response?.data?.message || err.message || 'Registration failed';
+        setErrors({ general: { message: msg } });
       });
   };
 
@@ -51,10 +45,9 @@ const Register = () => {
                     name="email"
                     className="form-control form-control-lg"
                     value={userInfo.email}
-                    onChange={updateField}
+                    onChange={handleChange}
                     placeholder="Introduce tu correo"
                   />
-                  {errors.email && (<div className="text-danger mt-2">{errors.email.message}</div>)}
                 </div>
                 <div className="form-group mb-4">
                   <label className="form-label fw-bold">Contraseña</label>
@@ -63,11 +56,10 @@ const Register = () => {
                     name="password"
                     className="form-control form-control-lg"
                     value={userInfo.password}
-                    onChange={updateField}
+                    onChange={handleChange}
                     placeholder="Crea una contraseña"
                   />
-                  {errors.password && (<div className="text-danger mt-2">{errors.password.message}</div>)}
-                </div>
+                 </div>
                 {errors.general && (<div className="text-danger mb-2">{errors.general.message}</div>)}
                 <button
                   type="submit"

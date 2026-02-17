@@ -23,11 +23,11 @@ const Profile = () => {
     navigate('/products/create');
   }
 
-  // Update avatar URL when user changes
+  // --- ACTUALIZAR IMAGEN DE PERFIL ---
   useEffect(() => {
     if (user?.avatar) {
-      setAvatarUrl(user.avatar);
-      setImageLoadError(false);
+      //setAvatarUrl(user.avatar);
+      //setImageLoadError(false);
     }
   }, [user?.avatar]);
 
@@ -46,33 +46,21 @@ const Profile = () => {
       
       await updateProfile(formData);
       
-      // Update local avatar URL with the new image
+      // --- ACTUALIZAR AVATAR ---
       const reader = new FileReader();
       reader.onload = (event) => {
         setAvatarUrl(event.target.result);
         setImageLoadError(false);
       };
       reader.readAsDataURL(file);
-      
-      alert('Avatar updated successfully!');
     } catch (err) {
-      console.error('Failed to update avatar', err);
-      alert('Error updating avatar');
-    } finally {
-      setUploadingAvatar(false);
-      // Reset the input
-      e.target.value = '';
+      console.error(err);
     }
   };
 
-  const handleImageError = () => {
-    setImageLoadError(true);
-  };
 
-  // Load created products
+  // - CARGAR PRODUCTOS CREADOS -
   useEffect(() => {
-    if (!user) return;
-    
     const load = async () => {
       try {
         const res = await getUserProducts();
@@ -80,30 +68,27 @@ const Profile = () => {
         const list = Array.isArray(data) ? data : data?.data || [];
         setUserProducts(list);
       } catch (err) {
-        console.error('Failed to load user products', err);
+        console.error('ERROR AL CARGAR LOS PRODUCTOS', err);
       }
     };
     load();
   }, [user]);
 
-  // Load bought and reserved products
+  // - CARGAR PRODUCTOS COMPRADOS Y RESERVADOS -
   useEffect(() => {
-    if (!user) return;
-    
     const load = async () => {
       try {
         const res = await getMyOrders();
         const data = res?.data || res;
         const orders = Array.isArray(data) ? data : data?.data || [];
         
-        // Separate orders by type
         const bought = orders.filter(o => o.type === 'purchase' || !o.type);
         const reserved = orders.filter(o => o.type === 'reservation');
         
         setBoughtProducts(bought);
         setReservedProducts(reserved);
       } catch (err) {
-        console.error('Failed to load orders', err);
+        console.error(err);
       }
     };
     load();
@@ -115,7 +100,6 @@ const Profile = () => {
     <div className="container">
       <div className="row justify-content-center">
         <div className="col-md-12">
-          {/* User Info Section */}
           <div className="card shadow mb-4">
             <div className="card-header bg-primary text-white">
               <h3 className="mb-0">Profile</h3>
@@ -132,14 +116,11 @@ const Profile = () => {
                         width: '150px', 
                         height: '150px', 
                         objectFit: 'cover',
-                        cursor: uploadingAvatar ? 'not-allowed' : 'pointer',
-                        opacity: uploadingAvatar ? 0.6 : 1,
                         transition: 'opacity 0.3s ease'
                       }}
                       onClick={handleAvatarClick}
-                      onError={handleImageError}
                     />
-                    {uploadingAvatar && (
+                    
                       <div style={{
                         position: 'absolute',
                         top: '50%',
@@ -151,25 +132,23 @@ const Profile = () => {
                           <span className="visually-hidden">Loading...</span>
                         </div>
                       </div>
-                    )}
+                    
                     <input
                       id="avatar-input"
                       type="file"
                       accept="image/*"
-                      style={{ display: 'none' }}
                       onChange={handleAvatarChange}
                       disabled={uploadingAvatar}
                     />
                   </div>
-                  <p className="text-muted small mt-2">Click to change avatar</p>
                 </div>
                 <div className="col-md-8">
                   <div className="mb-3">
-                    <label className="form-label fw-bold">Email</label>
+                    <label className="form-label fw-bold">Correo</label>
                     <p className="form-control-plaintext">{user.email}</p>
                   </div>
                   <div className="mb-3">
-                    <button className="btn btn-primary" onClick={goToCreate}>Create Article</button>
+                    <button className="btn btn-primary" style={{width: '40%' }} onClick={goToCreate}>CREAR ARTICULO</button>
                   </div>
                 </div>
               </div>
