@@ -16,7 +16,7 @@ const Store = () => {
   const [selectedStatus, setSelectedStatus] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   
-  const limit = 10;
+  const limit = 5;
   const [total, setTotal] = useState(0);
 
   // --- CARGAR CATEGORÍAS ---
